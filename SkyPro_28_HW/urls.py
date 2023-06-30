@@ -23,8 +23,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", root_view),
 
-    path("ads/", include('ads.urls.ads')),
+    path("ad/", include('ads.urls.ads')),
     path("cat/", include('ads.urls.categories')),
     path("loc/", include('ads.urls.locations')),
-    path("users/", include('ads.urls.users'))
+    path("user/", include('ads.urls.users'))
 ]
