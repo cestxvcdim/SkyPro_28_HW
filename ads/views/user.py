@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from django.views import View
 from django.views.generic import DetailView, ListView, CreateView, DeleteView, UpdateView
@@ -101,7 +102,7 @@ class UserCreateView(CreateView):
             first_name=user_data.get("first_name"),
             last_name=user_data.get("last_name"),
             username=user_data.get("username"),
-            password=user_data.get("password"),
+            password=make_password(user_data.get("password")),
             role=user_data.get("role"),
             age=user_data.get("age")
         )
@@ -145,7 +146,7 @@ class UserUpdateView(UpdateView):
         if item := user_data.get("username"):
             self.object.username = item
         if item := user_data.get("password"):
-            self.object.password = item
+            self.object.password = make_password(item)
         if item := user_data.get("role"):
             self.object.role = item
         if item := user_data.get("age"):

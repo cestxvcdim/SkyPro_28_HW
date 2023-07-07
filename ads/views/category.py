@@ -87,7 +87,7 @@ class CategoryUpdateView(UpdateView):
 
         category_data = json.loads(request.body)
 
-        if (item := category_data.get("name")) is not None:
+        if item := category_data.get("name"):
             self.object.name = item
 
         self.object.save()

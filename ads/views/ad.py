@@ -146,13 +146,13 @@ class AdUpdateView(UpdateView):
 
         ad_data = json.loads(request.body)
 
-        if (item := ad_data.get("name")) is not None:
+        if item := ad_data.get("name"):
             self.object.name = item
-        if (item := ad_data.get("price")) is not None:
+        if item := ad_data.get("price"):
             self.object.price = item
-        if (item := ad_data.get("description")) is not None:
+        if item := ad_data.get("description"):
             self.object.description = item
-        if (item := ad_data.get("is_published")) is not None:
+        if item := ad_data.get("is_published"):
             self.object.is_published = item
 
         self.object.author = get_object_or_404(User, pk=ad_data.get("author"))
