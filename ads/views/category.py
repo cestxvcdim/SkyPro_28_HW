@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.views import View
 from django.views.generic import DetailView, ListView, CreateView, DeleteView, UpdateView
 from django.utils.decorators import method_decorator
@@ -65,6 +66,11 @@ class CategoryCreateView(CreateView):
 
         category = Category.objects.create(name=category_data.get("name"))
 
+        try:
+            category.full_clean()
+        except ValidationError as e:
+            return JsonResponse(e.message_dict, status=422)
+
         return JsonResponse({
             "id": category.id,
             "name": category.name,
@@ -76,7 +82,7 @@ class CategoryUpdateView(UpdateView):
     model = Category
     fields = ['name']
 
-    def post(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
 
         category_data = json.loads(request.body)
@@ -85,6 +91,11 @@ class CategoryUpdateView(UpdateView):
             self.object.name = item
 
         self.object.save()
+
+        try:
+            self.object.full_clean()
+        except ValidationError as e:
+            return JsonResponse(e.message_dict, status=422)
 
         return JsonResponse({
             "id": self.object.id,

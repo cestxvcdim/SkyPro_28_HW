@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.views import View
 from django.views.generic import DetailView, ListView, CreateView, DeleteView, UpdateView
 from django.utils.decorators import method_decorator
@@ -116,6 +117,11 @@ class AdCreateView(CreateView):
             category=category
         )
 
+        try:
+            ad.full_clean()
+        except ValidationError as e:
+            return JsonResponse(e.message_dict, status=422)
+
         return JsonResponse({
             "id": ad.id,
             "name": ad.name,
@@ -135,7 +141,7 @@ class AdUpdateView(UpdateView):
     model = Ad
     fields = ['name', 'author', 'price', 'description', 'is_published', 'category']
 
-    def post(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
 
         ad_data = json.loads(request.body)
@@ -154,6 +160,11 @@ class AdUpdateView(UpdateView):
 
         self.object.save()
 
+        try:
+            self.object.full_clean()
+        except ValidationError as e:
+            return JsonResponse(e.message_dict, status=422)
+
         return JsonResponse({
             "id": self.object.id,
             "name": self.object.name,
@@ -162,9 +173,9 @@ class AdUpdateView(UpdateView):
             "price": self.object.price,
             "description": self.object.description,
             "is_published": self.object.is_published,
+            "image": self.object.image.url if self.object.image else None,
             "category": self.object.category.name,
-            "category_id": self.object.category_id,
-            "image": self.object.image.url if self.object.image else None
+            "category_id": self.object.category_id
         })
 
 
@@ -187,9 +198,9 @@ class AdImageView(UpdateView):
             "price": self.object.price,
             "description": self.object.description,
             "is_published": self.object.is_published,
+            "image": self.object.image.url if self.object.image else None,
             "category": self.object.category.name,
-            "category_id": self.object.category_id,
-            "image": self.object.image.url if self.object.image else None
+            "category_id": self.object.category_id
         })
 
 
@@ -201,4 +212,4 @@ class AdDeleteView(DeleteView):
     def delete(self, request, *args, **kwargs):
         super().delete(request, *args, **kwargs)
 
-        return JsonResponse({"message": "Deleted successfully"}, status=204)
+        return JsonResponse({"message": "Deleted successfully"}, status=200)

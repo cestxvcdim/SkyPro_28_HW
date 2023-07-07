@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.views import View
 from django.views.generic import DetailView, ListView, CreateView, DeleteView, UpdateView
 from django.utils.decorators import method_decorator
@@ -110,6 +111,11 @@ class UserCreateView(CreateView):
             user.locations.add(location)
         user.save()
 
+        try:
+            user.full_clean()
+        except ValidationError as e:
+            return JsonResponse(e.message_dict, status=422)
+
         return JsonResponse({
             "id": user.id,
             "first_name": user.first_name,
@@ -127,22 +133,22 @@ class UserUpdateView(UpdateView):
     model = User
     fields = ['first_name', 'last_name', 'username', 'password', 'role', 'age', 'locations']
 
-    def post(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
 
         user_data = json.loads(request.body)
 
-        if (item := user_data.get("first_name")) is not None:
+        if item := user_data.get("first_name"):
             self.object.first_name = item
-        if (item := user_data.get("last_name")) is not None:
+        if item := user_data.get("last_name"):
             self.object.last_name = item
-        if (item := user_data.get("username")) is not None:
+        if item := user_data.get("username"):
             self.object.username = item
-        if (item := user_data.get("password")) is not None:
+        if item := user_data.get("password"):
             self.object.password = item
-        if (item := user_data.get("role")) is not None:
+        if item := user_data.get("role"):
             self.object.role = item
-        if (item := user_data.get("age")) is not None:
+        if item := user_data.get("age"):
             self.object.age = item
 
         for location_data in user_data.get("locations"):
@@ -150,6 +156,11 @@ class UserUpdateView(UpdateView):
             self.object.locations.add(location)
 
         self.object.save()
+
+        try:
+            self.object.full_clean()
+        except ValidationError as e:
+            return JsonResponse(e.message_dict, status=422)
 
         return JsonResponse({
             "id": self.object.id,

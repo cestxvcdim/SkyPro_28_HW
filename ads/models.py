@@ -3,8 +3,8 @@ from django.db import models
 
 class Location(models.Model):
     name = models.CharField(max_length=100, verbose_name="название")
-    lat = models.FloatField(verbose_name="широта")
-    lng = models.FloatField(verbose_name="долгота")
+    lat = models.FloatField(verbose_name="широта", blank=True, null=True)
+    lng = models.FloatField(verbose_name="долгота", blank=True, null=True)
 
     class Meta:
 
@@ -22,10 +22,10 @@ class User(models.Model):
         ("moderator", "Модератор")
     ]
 
-    first_name = models.CharField(max_length=20, verbose_name="имя")
-    last_name = models.CharField(max_length=20, verbose_name="фамилия")
-    username = models.CharField(max_length=20, verbose_name="имя пользователя")
-    password = models.CharField(max_length=20, verbose_name="пароль")
+    first_name = models.CharField(max_length=40, verbose_name="имя")
+    last_name = models.CharField(max_length=40, verbose_name="фамилия")
+    username = models.CharField(max_length=40, verbose_name="имя пользователя")
+    password = models.CharField(max_length=40, verbose_name="пароль")
     role = models.CharField(max_length=9, choices=ROLES, default="user", verbose_name="роль")
     age = models.PositiveSmallIntegerField(verbose_name="возраст")
     locations = models.ManyToManyField(Location, verbose_name="локации")
@@ -53,7 +53,7 @@ class Category(models.Model):
 
 class Ad(models.Model):
     name = models.CharField(max_length=100, verbose_name="название")
-    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="автор")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, verbose_name="автор")
     price = models.PositiveIntegerField(verbose_name="цена")
     description = models.CharField(max_length=500, null=True, verbose_name="описание")
     is_published = models.BooleanField(default=False, verbose_name="опубликовано")
